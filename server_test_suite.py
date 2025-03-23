@@ -1,11 +1,15 @@
-"""Test suite for the server application, validating key generation, database operations, and endpoints."""
+"""
+Test suite for the server application, 
+validating key generation, database operations, and endpoints.
+"""
 
 import unittest
 import datetime
 import sqlite3
 import json
 from cryptography.hazmat.primitives.asymmetric import rsa
-from server import app, initialize_db, save_private_key_to_db, get_private_key_from_db, generate_and_store_keys
+from server import app, initialize_db
+from server import save_private_key_to_db, get_private_key_from_db, generate_and_store_keys
 
 
 class TestApp(unittest.TestCase):
@@ -77,7 +81,7 @@ class TestApp(unittest.TestCase):
     def test_get_private_key_from_db(self):
         """Test private key retrieval from the database."""
         private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
-        exp = int(datetime.datetime.now(datetime.timezone.utc).timestamp()) + 3600  # Set expiration time
+        exp = int(datetime.datetime.now(datetime.timezone.utc).timestamp())+3600
         save_private_key_to_db(private_key, exp)
 
         # Fetch valid key from the database.
@@ -94,7 +98,7 @@ class TestApp(unittest.TestCase):
     def test_save_private_key_to_db(self):
         """Test saving a private key to the database."""
         private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
-        exp = int(datetime.datetime.now(datetime.timezone.utc).timestamp()) + 3600  # Set expiration time
+        exp = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
         save_private_key_to_db(private_key, exp)
 
         # Verify key saved by checking count in database.
@@ -108,7 +112,7 @@ class TestApp(unittest.TestCase):
     def test_expired_key(self):
         """Test expired key handling."""
         expired_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
-        expired_time = int(datetime.datetime.now(datetime.timezone.utc).timestamp()) - 3600  # Expired time
+        expired_time = int(datetime.datetime.now(datetime.timezone.utc).timestamp())-3600
         save_private_key_to_db(expired_key, expired_time)
 
         # Try fetching expired key.
@@ -126,6 +130,7 @@ class TestApp(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()  # Run the tests
+
 
 
 
