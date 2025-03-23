@@ -1,3 +1,10 @@
+"""
+This module implements JWT-based authentication using RSA keys stored in an SQLite database.
+It exposes two routes:
+1. /auth - Accepts a POST request to authenticate users and return a signed JWT token.
+2. /.well-known/jwks.json - Returns the public keys in JSON Web Key Set (JWKS) format.
+"""
+
 import base64
 import sqlite3
 import datetime
@@ -5,13 +12,6 @@ import jwt
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from flask import Flask, request, jsonify
-
-"""
-This module implements JWT-based authentication using RSA keys stored in an SQLite database.
-It exposes two routes:
-1. /auth - Accepts a POST request to authenticate users and return a signed JWT token.
-2. /.well-known/jwks.json - Returns the public keys in JSON Web Key Set (JWKS) format.
-"""
 
 app = Flask(__name__)
 
@@ -82,8 +82,10 @@ def generate_and_store_keys():
         public_exponent=65537,
         key_size=2048,
     )
-    save_private_key_to_db(valid_key, int(datetime.datetime.now(datetime.timezone.utc).timestamp()) + 3600)
-    save_private_key_to_db(expired_key, int(datetime.datetime.now(datetime.timezone.utc).timestamp()) - 3600)
+    save_private_key_to_db(valid_key,int(datetime.datetime.now(datetime.timezone.utc).timestamp())
+                           +3600)
+    save_private_key_to_db(expired_key,int(datetime.datetime.now(datetime.timezone.utc).timestamp())
+                           -3600)
 
 @app.route('/auth', methods=['POST'])
 def authenticate_user():
@@ -98,8 +100,11 @@ def authenticate_user():
     token_payload = {
         'sub': request_data['username'],
         'iat': datetime.datetime.now(datetime.timezone.utc),
-        'exp': datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=30)
-        if not include_expired_token else datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(minutes=30)
+        'exp': (
+            datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=30)
+        ) if not include_expired_token else (
+            datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(minutes=30)
+        )
     }
     token = jwt.encode(token_payload, private_key, algorithm='RS256', headers={'kid': str(kid)})
     return jsonify({'token': token})
