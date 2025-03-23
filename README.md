@@ -43,8 +43,8 @@ By utilizing SQLite, the JWKS server now supports:
 
 ### **1️⃣ Clone the Repository**  
 ```bash  
-git clone https://github.com/yourusername/extended-jwks-server.git  
-cd extended-jwks-server  
+git clone https://github.com/NiallJC/Extending-my-JWKS-server.git  
+cd Extending-my-JWKS-server
 ```
 
 ### **2️⃣ Install dependencies**  
